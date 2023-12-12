@@ -30,8 +30,6 @@ function Gameboard () {
     }
 
     const addMark = (row, col, mark) => {
-        row--;
-        col--;
         if(board[row][col].getValue() !== '_') {
             return;
         }
@@ -125,6 +123,7 @@ function GameController(
                 break;
             case 'draw':
                 console.log(`This match is a tie.`);
+                board.resetBoard();
                 break;
         }
     }
@@ -132,9 +131,48 @@ function GameController(
 
     printNewRound();
 
-    return {getActivePlayer, playRound, checkWin};
+    return {getActivePlayer, playRound, getBoard: board.getBoard};
 }
 
-const game = GameController();
+function ScreenController() {
+    const game = GameController();
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
 
+    const updateScreen = () => {
+        boardDiv.textContent = "";
+
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
+
+        board.forEach((row, ri) => {
+            row.forEach((col, ci) => {
+                const cellButton = document.createElement('button');
+                cellButton.classList.add('cell');
+                cellButton.dataset.row = ri;
+                cellButton.dataset.column = ci;
+                cellButton.textContent = col.getValue();
+                boardDiv.appendChild(cellButton);
+            })
+        })
+    }
+
+    function clickHandlerBoard(e) {
+        const row = e.target.dataset.row;
+        const column = e.target.dataset.column;
+    
+        if(!row || !column) return;
+    
+        game.playRound(row, column);
+        updateScreen();
+    }
+    boardDiv.addEventListener('click', clickHandlerBoard);
+
+    updateScreen();
+}
+
+
+ScreenController();
 

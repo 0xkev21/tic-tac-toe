@@ -4,11 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="turn"></h1>
+    <h1>Classic Tic-Tac-Toe</h1>
+    <div class="game-menu">
+        <div class="player-one-container">
+            <label for="playerOne">Player One's Name (X)</label>
+            <input type="text" name="player one" id="playerOne">
+        </div>
+
+        <div class="player-two-container">
+            <label for="playerTwo">Player Two's Name (O)</label>
+            <input type="text" name="player two" id="playerTwo">
+        </div>
+
+        <p>X gets first turn</p>
+
+        <button type="button" id="startGame">Start Game</button>
+    </div>
+
+    <div class="game-container">
+        <h3 class="turn"></h3>
         <div class="board"></div>
+        <div class="result"></div>
     </div>
     <script src="script.js"></script>
 </body>

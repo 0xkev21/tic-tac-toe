@@ -60,7 +60,11 @@ function GameController(
 
     let activePlayer = players[0];
 
+    let winner = null;
+
     const getActivePlayer = () => activePlayer;
+
+    const getWinner = () => winner;
 
     const switchActivePlayer = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0]; 
@@ -82,6 +86,7 @@ function GameController(
             switchActivePlayer();
         }
         printNewRound();
+        return handleWin(result);
     }
 
     const checkWin = () => {
@@ -118,26 +123,39 @@ function GameController(
     const handleWin = (check) => {
         switch(check) {
             case 'win':
-                console.log(`${getActivePlayer().name} wins this match.`);
+                winner = getActivePlayer();
+                console.log(`${winner.name} wins this match.`);
                 board.resetBoard();
                 break;
             case 'draw':
+                winner = null;
                 console.log(`This match is a tie.`);
                 board.resetBoard();
                 break;
+            default:
+                winner = null;
         }
     }
     
 
     printNewRound();
 
-    return {getActivePlayer, playRound, getBoard: board.getBoard};
+    return {getActivePlayer, playRound, getBoard: board.getBoard, getWinner};
 }
 
 function ScreenController() {
-    const game = GameController();
+    let game = null;
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
+    const result = document.querySelector('.result');
+    const startGameBtn = document.querySelector('#startGame');
+    const gameContainer = document.querySelector('.game-container');
+
+    startGameBtn.addEventListener('click', () => {
+        game = GameController();
+        gameContainer.style.display = 'block';
+        updateScreen();
+    })
 
     const updateScreen = () => {
         boardDiv.textContent = "";
@@ -146,6 +164,9 @@ function ScreenController() {
         const activePlayer = game.getActivePlayer();
 
         playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
+
+        result.textContent = '';
+        if(game.getWinner()) result.textContent = `${game.getWinner().name} wins this match !`;
 
         board.forEach((row, ri) => {
             row.forEach((col, ci) => {
@@ -170,7 +191,6 @@ function ScreenController() {
     }
     boardDiv.addEventListener('click', clickHandlerBoard);
 
-    updateScreen();
 }
 
 

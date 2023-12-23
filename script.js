@@ -11,41 +11,41 @@ function Cell() {
 }
 
 function Gameboard () {
-    const rows = 3;
-    const cols = 3;
     const board = [];
 
-    for(let i = 0; i < rows; i++) {
-        board.push([]);
-        for(let j = 0; j < cols; j++) {
-            board[i].push(Cell());
-        }
+    for(let i = 0; i < 9; i++) {
+        const cell = Cell();
+        cell.addMark(i);
+        board.push(cell);
     }
 
     const getBoard = () => board;
 
     const printBoard = () => {
-        const boardWithValues = board.map(row => row.map(cell => cell.getValue()));
+        const boardWithValues = board.map(cell => cell.getValue());
         console.log(boardWithValues);
+        return boardWithValues;
     }
 
-    const addMark = (row, col, mark) => {
-        if(board[row][col].getValue() !== '_') {
+    const addMark = (cell, mark) => {
+        if(typeof board[cell].getValue() !== 'number') {
             return;
         }
-        board[row][col].addMark(mark);
+        board[cell].addMark(mark);
         return true;
     }
 
     const resetBoard = () => {
-        for(let i = 0; i < rows; i++) {
-            for(let j = 0; j < cols; j++) {
-                board[i][j].addMark('_');
-            }
+        for(let i = 0; i < 9; i++) {
+            board[i].addMark(i);
         }
     }
 
-    return {getBoard, printBoard, addMark, resetBoard};
+    const getEmptyCells = () => {
+        return board.filter(cell => typeof cell.getValue() !== 'number');
+    }
+
+    return {getBoard, printBoard, addMark, resetBoard ,getEmptyCells};
 }
 
 function GameController(
@@ -60,9 +60,9 @@ function GameController(
 
     let activePlayer = players[0];
 
-    let winner = null;
-
     const getActivePlayer = () => activePlayer;
+
+    let winner = null;
 
     const getWinner = () => winner;
 
@@ -75,69 +75,64 @@ function GameController(
         board.printBoard();
     }
 
-    const playRound = (row, col) => {
-        if(!board.addMark(row, col, getActivePlayer().marker)) return;
+    const playRound = (cell) => {
+        if(!board.addMark(cell, getActivePlayer().marker)) return;
 
-        console.log(`Adding ${getActivePlayer().name}'s mark at row ${row}, column ${col}.`);
+        console.log(`Adding ${getActivePlayer().name}'s mark at cell ${cell}.`);
 
-        const result = checkWin();
+        const result = checkWin(board);
         handleWin(result);
         if(!result) {
             switchActivePlayer();
+        } else {
+            activePlayer = players[0];
         }
         printNewRound();
-        return handleWin(result);
     }
 
-    const checkWin = () => {
+    const checkWin = (board) => {
+        const boardWithValues = board.printBoard();
+        let gameWon = null;
         const activePlayerMarker = getActivePlayer().marker;
-        const boardWithValues = board.getBoard().map(row => row.map(cell => cell.getValue()));
+        const plays = boardWithValues.reduce((acc, elem, index) => {
+            return elem === activePlayerMarker ? acc.concat(index) : acc;
+        }, [])
+        const winConditions = [
+            [0,1,2],
+            [3,4,5],
+            [6,7,8],
+            [0,3,6],
+            [1,4,7],
+            [2,5,8],
+            [0,4,8],
+            [2,4,6]
+        ]
 
-        // Check rows
-        if(boardWithValues.some(row => row.every(cell => cell === activePlayerMarker))) {
-            return 'win';
-        }
-
-        // Check columns
-        if(boardWithValues.some((_, col) => 
-        boardWithValues.every(row => row[col] === activePlayerMarker))) {
-            return 'win';
-        }
-
-        // Check diagonals
-        // main diagonal
-        if(boardWithValues.every((row, index) => row[index] === activePlayerMarker)) {
-            return 'win';
-        }
-        // other diagonal
-        if(boardWithValues.every((row, index) => row[boardWithValues.length - 1 - index] === activePlayerMarker)) {
-            return 'win';
+        if(board.getEmptyCells().length === 0) {
+            gameWon = 'tie';
         }
 
-        // Draw condition
-        if(boardWithValues.every(row => row.every(cell => cell !== '_'))) {
-            return 'draw';
+        for(const [index, win] of winConditions.entries()) {
+            if(win.every(elem => plays.indexOf(elem) > -1)) {
+                gameWon = {index : index, player : activePlayer};
+            }
         }
+        return gameWon;
     }
     
     const handleWin = (check) => {
-        switch(check) {
-            case 'win':
-                winner = getActivePlayer();
-                console.log(`${winner.name} wins this match.`);
-                board.resetBoard();
-                break;
-            case 'draw':
-                winner = null;
-                console.log(`This match is a tie.`);
-                board.resetBoard();
-                break;
-            default:
-                winner = null;
+        if(check === 'tie') {
+            console.log('tie');
+            return 'This is a Tie Match!';
+        } else if(check) {
+            winner = check.player;
+            console.log(`${check.player} wins this Match!`);
+            return `${check.player} wins this Match!`;
+        } else {
+            winner = null;
         }
     }
     
-
     printNewRound();
 
     return {getActivePlayer, playRound, getBoard: board.getBoard, getWinner};
@@ -150,9 +145,12 @@ function ScreenController() {
     const result = document.querySelector('.result');
     const startGameBtn = document.querySelector('#startGame');
     const gameContainer = document.querySelector('.game-container');
+    const playerOneInput = document.querySelector('#playerOne');
+    const playerTwoInput = document.querySelector('#playerTwo');
 
     startGameBtn.addEventListener('click', () => {
-        game = GameController();
+        game = GameController(playerOneInput.value || undefined, playerTwoInput.value || undefined);
+        console.log(playerOneInput, playerTwoInput)
         gameContainer.style.display = 'block';
         updateScreen();
     })
@@ -166,27 +164,24 @@ function ScreenController() {
         playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
 
         result.textContent = '';
-        if(game.getWinner()) result.textContent = `${game.getWinner().name} wins this match !`;
+        if(game.getWinner() === 'tie') result.textContent = `This game is a Tie !`;
+        else if(game.getWinner()) result.textContent = `${game.getWinner().name} wins this match !`;
 
-        board.forEach((row, ri) => {
-            row.forEach((col, ci) => {
-                const cellButton = document.createElement('button');
-                cellButton.classList.add('cell');
-                cellButton.dataset.row = ri;
-                cellButton.dataset.column = ci;
-                cellButton.textContent = col.getValue();
-                boardDiv.appendChild(cellButton);
-            })
+        board.forEach(cell => {
+            const cellButton = document.createElement('button');
+            cellButton.classList.add('cell');
+            cellButton.dataset.index = cell.getValue();
+            cellButton.textContent = typeof cell.getValue() !== 'number' ? cell.getValue() : '';
+            boardDiv.appendChild(cellButton);
         })
     }
 
     function clickHandlerBoard(e) {
-        const row = e.target.dataset.row;
-        const column = e.target.dataset.column;
+        const index = e.target.dataset.index;
     
-        if(!row || !column) return;
+        if(!index) return;
     
-        game.playRound(row, column);
+        game.playRound(index);
         updateScreen();
     }
     boardDiv.addEventListener('click', clickHandlerBoard);

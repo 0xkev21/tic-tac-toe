@@ -1,5 +1,6 @@
-function Cell() {
-    let value = '_';
+function Cell(initialValue) {
+
+    let value = initialValue;
 
     const getValue = () => value;
     
@@ -11,13 +12,9 @@ function Cell() {
 }
 
 function Gameboard () {
-    const board = [];
 
-    for(let i = 0; i < 9; i++) {
-        const cell = Cell();
-        cell.addMark(i);
-        board.push(cell);
-    }
+    const board = Array.from({ length: 9 }, (_, index) => Cell(index));
+
 
     const getBoard = () => board;
 
@@ -42,7 +39,7 @@ function Gameboard () {
     }
 
     const getEmptyCells = () => {
-        return board.filter(cell => typeof cell.getValue() !== 'number');
+        return board.filter(cell => typeof cell.getValue() === 'number');
     }
 
     return {getBoard, printBoard, addMark, resetBoard ,getEmptyCells};
@@ -50,13 +47,25 @@ function Gameboard () {
 
 function GameController(
     playerOneName = 'Player One',
-    playerTwoName = 'Player Two'
+    playerTwoName = 'Player Two',
+    isPlayerOneBot = false,
+    isPlayerTwoBot = false
 ) {
     const players = [
-        {name: playerOneName, marker: 'X'},
-        {name: playerTwoName, marker: 'O'}
+        {name: playerOneName, marker: 'X', isBot: isPlayerOneBot},
+        {name: playerTwoName, marker: 'O', isBot: isPlayerTwoBot}
     ];
+
     const board = Gameboard();
+
+    let bot1, bot2;
+
+    if(isPlayerOneBot) {
+        bot1 = Bot('X', board);
+    }
+    if(isPlayerTwoBot) {
+        bot2 = Bot('O', board);
+    }
 
     let activePlayer = players[0];
 
@@ -68,11 +77,41 @@ function GameController(
 
     const switchActivePlayer = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0]; 
+        if(activePlayer.isBot) {
+            playBotMove();
+        }
+    }
+
+    function Bot (marker) {
+
+        const botMarker = marker;
+    
+        const makeMove = (origBoard) => {
+            const emptyCells = origBoard.getEmptyCells().map(cell => cell.getValue());
+            if(emptyCells.length > 0) {
+                const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                console.log(emptyCells);
+                return emptyCells[randomIndex];
+            }
+            return null;
+        }
+        return {makeMove};
+    }
+
+    const playBotMove = () => {
+        if (bot1) {
+            const move = bot1.makeMove(board);
+            if(move) playRound(move);
+        } else if(bot2) {
+            const move = bot2.makeMove(board);
+            if(move) playRound(move);
+        }
     }
 
     const printNewRound = () => {
         console.log(`${getActivePlayer().name}'s turn.`);
         board.printBoard();
+        if(activePlayer.isBot) return;
     }
 
     const playRound = (cell) => {
@@ -108,7 +147,7 @@ function GameController(
             [2,4,6]
         ]
 
-        if(board.getEmptyCells().length === 0) {
+        if(board.getEmptyCells().length === 0 && gameWon === null) {
             gameWon = 'tie';
         }
 
@@ -132,7 +171,7 @@ function GameController(
             winner = null;
         }
     }
-    
+
     printNewRound();
 
     return {getActivePlayer, playRound, getBoard: board.getBoard, getWinner};
@@ -170,7 +209,7 @@ function ScreenController() {
         board.forEach(cell => {
             const cellButton = document.createElement('button');
             cellButton.classList.add('cell');
-            cellButton.dataset.index = cell.getValue();
+            cellButton.dataset.index = board.indexOf(cell);
             cellButton.textContent = typeof cell.getValue() !== 'number' ? cell.getValue() : '';
             boardDiv.appendChild(cellButton);
         })
@@ -189,5 +228,5 @@ function ScreenController() {
 }
 
 
-ScreenController();
-
+// ScreenController();
+const game = GameController('Kev', 'Bot', false, true);

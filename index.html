@@ -8,27 +8,63 @@
 </head>
 <body>
     <h1>Classic Tic-Tac-Toe</h1>
-    <div class="game-menu">
+
+    <div class="start-menu">
         <div class="player-one-container">
-            <label for="playerOne">Player One (X)</label>
-            <input type="text" name="player one" id="playerOne" placeholder="Player One's Name">
+            <div class="player-one-name-container">
+                <label for="playerOne">Player One :</label>
+                <input type="text" name="player one" id="playerOne" placeholder="Player One's Name">
+            </div>
+            <div class="mark-and-bot">
+                <div class="mark">X</div>
+                <div class="bot-container">
+                    <!-- svg for bot -->
+                    <label for="bot-x">Unbeatable Computer</label>
+                    <input type="checkbox" name="bot-x" id="bot-x">
+                </div>
+            </div>
         </div>
 
         <div class="player-two-container">
-            <label for="playerTwo">Player Two (O)</label>
-            <input type="text" name="player two" id="playerTwo" placeholder="Player Two's Name">
+            <div class="player-two-name-container">
+                <label for="playerTwo">Player One :</label>
+                <input type="text" name="player two" id="playerTwo" placeholder="Player One's Name">
+            </div>
+            <div class="mark-and-bot">
+                <div class="mark">O</div>
+                <div class="bot-container">
+                    <!-- svg for bot -->
+                    <label for="bot-y">Unbeatable Computer</label>
+                    <input type="checkbox" name="bot-y" id="bot-y">
+                </div>
+            </div>
         </div>
-
-        <p>X gets first turn</p>
-
         <button type="button" id="startGame">Start Game</button>
+
+        <p>X gets first turn !</p>
+        <p>Note: You won't win against the Unbeatable Computer !</p>
     </div>
 
     <div class="game-container">
         <h3 class="turn"></h3>
         <div class="board"></div>
-        <div class="result"></div>
     </div>
+
+    <div class="ingame-menu">
+        <button type="button" id="menuButton">Menu</button>
+        <button type="button" id="restartButton">Restart</button>
+        <button type="button" class="home-button">Home</button>
+    </div>
+
+    <div class="game-over-container">
+        <p id="game-over">Game Over !</p>
+        <div class="result"></div>
+        <div class="game-over-buttons">
+            <button type="button" id="playAgainButton">Play Again</button>
+            <button type="button" class="home-button">Home</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

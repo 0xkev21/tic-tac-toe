@@ -7,9 +7,17 @@
     display: none;
 }
 
+.game-over-container {
+    display: none;
+}
+
 .board {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     width: 300px;
     height: 300px;
+}
+
+.ingame-menu {
+    display: none;
 }

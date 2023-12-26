@@ -4,11 +4,11 @@
 }
 
 .game-container {
-    display: none;
+    
 }
 
 .game-over-container {
-    display: none;
+    
 }
 
 .board {
@@ -19,5 +19,5 @@
 }
 
 .ingame-menu {
-    display: none;
+    
 }

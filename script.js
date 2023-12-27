@@ -224,16 +224,33 @@ function GameController(
 }
 
 function ScreenController() {
+    // game section containers
+    const startMenuContainer = document.querySelector('.start-menu');
+    const gameContainer = document.querySelector('.game-container');
+    const inGameMenuContainer = document.querySelector('.ingame-menu');
+    const gameOverContainer = document.querySelector('.game-over-container');
+
+    // buttons
+    const startGameBtn = document.querySelector('#startGame');
+
     let game = null;
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
     const result = document.querySelector('.result');
-    const startGameBtn = document.querySelector('#startGame');
-    const gameContainer = document.querySelector('.game-container');
+    
     const playerOneInput = document.querySelector('#playerOne');
     const playerTwoInput = document.querySelector('#playerTwo');
     const isPlayerOneBot = document.querySelector('#bot-x');
     const isPlayerTwoBot = document.querySelector('#bot-o');
+
+    // create board
+    for(let i = 0; i  < 9; i++) {
+        const cellButton = document.createElement('button');
+        cellButton.classList.add('cell');
+        cellButton.dataset.index = i;
+        cellButton.textContent = '';
+        boardDiv.appendChild(cellButton);
+    }
 
     startGameBtn.addEventListener('click', () => {
         game = GameController(playerOneInput.value || undefined, playerTwoInput.value || undefined, isPlayerOneBot.checked, isPlayerTwoBot.checked);
@@ -260,14 +277,6 @@ function ScreenController() {
             result.textContent = `${game.getWinner().name} wins this match !`;
             game.resetBoard();
         }
-        
-        boardWithValues.forEach(cell => {
-            const cellButton = document.createElement('button');
-            cellButton.classList.add('cell');
-            cellButton.dataset.index = boardWithValues.indexOf(cell);
-            cellButton.textContent = typeof cell.getValue() !== 'number' ? cell.getValue() : '';
-            boardDiv.appendChild(cellButton);
-        })
     }
 
     function clickHandlerBoard(e) {

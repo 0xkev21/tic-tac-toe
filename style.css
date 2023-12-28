@@ -13,6 +13,7 @@
     --secondary-color: #D5B882;
     --hover-color: rgb(128, 86, 57);
     --unchecked-color: #614730;
+    --disabled-color: #716A5C;
     --default-radius: 15px;
 }
 
@@ -62,6 +63,14 @@ h1 {
     color: var(--secondary-color);
     align-self: center;
     font-weight: bold;
+}
+
+.disabled [for*="player"] {
+    color: var(--disabled-color);
+}
+
+.disabled #playerOne, .disabled #playerTwo {
+    background-color: var(--disabled-color);
 }
 
 #playerOne, #playerTwo {
@@ -114,6 +123,10 @@ h1 {
     padding: 5px;
     border-radius: var(--default-radius);
     cursor: pointer;
+}
+
+.bot-container.disabled {
+    background-color: var(--disabled-color);
 }
 
 [id*="bot"] {
@@ -267,6 +280,10 @@ h1 {
     border-right: none;
 }
 
+.winIndex {
+    background: rgba(90, 106, 97, 0.4);
+}
+
 .ingame-menu {
     display: flex;
     flex-direction: column;
@@ -391,6 +408,14 @@ h1 {
 .game-over-container.gameOver {
     opacity: 1;
     visibility: visible;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.checked {
+    --primary-color: #2F160D;
 }
 
 .animate-scaleDown {

@@ -48,6 +48,12 @@ function GameController(
         {name: playerTwoName, marker: 'O', isBot: isPlayerTwoBot}
     ];
 
+    players.forEach(player => {
+        if(player.isBot) {
+            player.name = 'The Computer';
+        }
+    })
+
     const board = Gameboard();
 
     let activePlayer = players[0];
@@ -123,7 +129,6 @@ function GameController(
             return 'This is a Tie Match!';
         } else if(check) {
             winner = check;
-            console.log(winner);
             console.log(`${check.player.name} wins this Match!`);
             return `${check.player.name} wins this Match!`;
         } else {
@@ -210,7 +215,6 @@ function GameController(
 
     const playBotMove = () => {
         const move = findBotMove(board.printBoard() ,getActivePlayer().marker);
-        console.log(move);
         playRound(move);
     }
 
@@ -222,11 +226,7 @@ function GameController(
 function ScreenController() {
     // game section containers
     const gameSections = document.querySelectorAll('.game-section');
-
-    const startMenuContainer = document.querySelector('.start-menu');
-    const gameContainer = document.querySelector('.game-container');
     const inGameMenuContainer = document.querySelector('.ingame-menu');
-    const gameOverContainer = document.querySelector('.game-over-container');
 
     // buttons
     const startGameBtn = document.querySelector('#startGame');
@@ -239,7 +239,8 @@ function ScreenController() {
     const playerTwoInput = document.querySelector('#playerTwo');
     const isPlayerOneBot = document.querySelector('#bot-x');
     const isPlayerTwoBot = document.querySelector('#bot-o');
-
+    const botContainers = document.querySelectorAll('.bot-container');
+    
     // to show result
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
@@ -266,6 +267,7 @@ function ScreenController() {
 
     const resetGame = () => {
         cells.forEach(cell => cell.classList.remove('animate-scaleDown'));
+        cells.forEach(cell => cell.classList.remove('winIndex'));
         gameSections.forEach(section => section.classList.remove('gameOver'));
         gameSections.forEach(section => section.classList.remove('inGame'));
     }
@@ -303,7 +305,10 @@ function ScreenController() {
 
         if(winner === 'tie') {
             result.textContent = `This match is a Tie !`;
-        } else if(game.getWinner()) {
+        } else if(winner) {
+            winner.indexRow.forEach(index => {
+                document.querySelector(`[data-index='${index}']`).classList.add('winIndex');
+            })
             result.textContent = `${game.getWinner().player.name} wins this match !`;
         }
 
@@ -328,7 +333,35 @@ function ScreenController() {
     menuBtn.addEventListener('click', () => {
         inGameMenuContainer.classList.toggle('active');
     });
+
+    botContainers.forEach(bot => bot.addEventListener('click', (e) => {
+        makeOtherDisabled(e);
+    }), true);
+
+    function makeOtherDisabled (e) {
+
+        const playerOneNameContainer = document.querySelector('.player-one-name-container');
+        const playerTwoNameContainer = document.querySelector('.player-two-name-container');
+        const playerOneBotContainer = document.querySelector(`[for='bot-x']`);
+        const playerTwoBotContainer = document.querySelector(`[for='bot-o']`);
+        const idClicked = e.target.id;
+
+        switch(idClicked) {
+            case 'bot-x':
+                playerOneInput.value = '';
+                playerOneNameContainer.classList.toggle('disabled');
+                playerOneBotContainer.classList.toggle('checked');
+                playerTwoBotContainer.classList.toggle('disabled');
+                break;
+            case 'bot-o':
+                playerTwoInput.value = '';
+                playerTwoNameContainer.classList.toggle('disabled');
+                playerTwoBotContainer.classList.toggle('checked');
+                playerOneBotContainer.classList.toggle('disabled');
+            break;
+        }
+    }
 }
 
 
-ScreenController()
+ScreenController();

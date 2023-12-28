@@ -15,20 +15,13 @@ function Gameboard () {
 
     const board = Array.from({ length: 9 }, (_, index) => Cell(index));
 
-
-    const getBoard = () => board;
-
     const printBoard = () => {
         const boardWithValues = board.map(cell => cell.getValue());
         return boardWithValues;
     }
 
     const addMark = (cell, mark) => {
-        if(typeof board[cell].getValue() !== 'number') {
-            return;
-        }
         board[cell].addMark(mark);
-        return true;
     }
 
     const resetBoard = () => {
@@ -38,10 +31,10 @@ function Gameboard () {
     }
 
     const getEmptyCells = () => {
-        return board.filter(cell => typeof cell.getValue() === 'number');
+        return board.filter(cell => typeof cell.getValue() === 'number').map(cell => cell.getValue());
     }
 
-    return {getBoard, printBoard, addMark, resetBoard ,getEmptyCells};
+    return {printBoard, addMark, resetBoard ,getEmptyCells};
 }
 
 function GameController(
@@ -56,8 +49,6 @@ function GameController(
     ];
 
     const board = Gameboard();
-
-    let bot;
 
     let activePlayer = players[0];
 
@@ -74,24 +65,31 @@ function GameController(
     const printNewRound = () => {
         console.log(`${getActivePlayer().name}'s turn.`);
         board.printBoard();
-        if(activePlayer.isBot) {
+        if(activePlayer.isBot && checkTie(board) !== 'tie') {
             playBotMove();
         }
     }
 
     const playRound = (cell) => {
-        if(!board.addMark(cell, getActivePlayer().marker)) return;
+        board.addMark(cell, getActivePlayer().marker);
 
         console.log(`Adding ${getActivePlayer().name}'s mark at cell ${cell}.`);
 
-        const result = checkWin(board.printBoard(), getActivePlayer().marker);
+        const result = checkWin(board.printBoard(), getActivePlayer().marker) || checkTie(board);
         handleWin(result);
         if(!result) {
             switchActivePlayer();
+            printNewRound();
         } else {
             activePlayer = players[0];
         }
-        printNewRound();
+    }
+
+    function checkTie (board) {
+        const emptyCells = board.getEmptyCells();
+        if(emptyCells.length === 0) {
+            return 'tie';
+        }
     }
 
     function checkWin (board, marker) {
@@ -110,15 +108,9 @@ function GameController(
             [2,4,6]
         ]
 
-        const emptyCells = board.filter(cell => typeof cell === 'number');
-
-        if(emptyCells.length === 0 && gameWon === null) {
-            gameWon = 'tie';
-        }
-
         for(const [index, win] of winConditions.entries()) {
             if(win.every(elem => plays.indexOf(elem) > -1)) {
-                gameWon = {index : index, player : getActivePlayer()};
+                gameWon = {indexRow : winConditions[index], player : getActivePlayer()};
             }
         }
         return gameWon;
@@ -126,10 +118,12 @@ function GameController(
     
     const handleWin = (check) => {
         if(check === 'tie') {
-            console.log('tie');
+            winner = 'tie';
+            console.log('This is a Tie Match!');
             return 'This is a Tie Match!';
         } else if(check) {
-            winner = check.player;
+            winner = check;
+            console.log(winner);
             console.log(`${check.player.name} wins this Match!`);
             return `${check.player.name} wins this Match!`;
         } else {
@@ -142,11 +136,13 @@ function GameController(
         const botMarker = marker;
         const playerMarker = players[0].isBot ? players[1].marker : players[0].marker;
 
-
         // minmax algorithm for bot
         const minmax = (board, marker) => {
             // get empty cells
             const emptyCellIndices = board.filter(cell => typeof cell === 'number');
+
+            // make random move if the bot got first move for better performance
+            if(emptyCellIndices.length === 9) return {score: 0, index: Math.floor(Math.random()* 9)};
 
             // terminal states
             if(checkWin(board, botMarker)) {
@@ -205,10 +201,10 @@ function GameController(
                     }
                 }
             }
+            
 
             return allTestPlays[bestPlayIndex];
         }
-
         return minmax(origBoard, botMarker).index;
     }
 
@@ -220,11 +216,13 @@ function GameController(
 
     printNewRound();
 
-    return {getActivePlayer, playRound, getBoard: board.getBoard, resetBoard: board.resetBoard, getWinner};
+    return {getActivePlayer, playRound, printBoard: board.printBoard, resetBoard: board.resetBoard, getWinner};
 }
 
 function ScreenController() {
     // game section containers
+    const gameSections = document.querySelectorAll('.game-section');
+
     const startMenuContainer = document.querySelector('.start-menu');
     const gameContainer = document.querySelector('.game-container');
     const inGameMenuContainer = document.querySelector('.ingame-menu');
@@ -232,16 +230,22 @@ function ScreenController() {
 
     // buttons
     const startGameBtn = document.querySelector('#startGame');
+    const menuBtn = document.querySelector('#menuButton');
+    const restartBtns = document.querySelectorAll('.restart-button');
+    const homeBtns = document.querySelectorAll('.home-button');
 
-    let game = null;
-    const playerTurnDiv = document.querySelector('.turn');
-    const boardDiv = document.querySelector('.board');
-    const result = document.querySelector('.result');
-    
+    // get inputs
     const playerOneInput = document.querySelector('#playerOne');
     const playerTwoInput = document.querySelector('#playerTwo');
     const isPlayerOneBot = document.querySelector('#bot-x');
     const isPlayerTwoBot = document.querySelector('#bot-o');
+
+    // to show result
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+    const result = document.querySelector('.result');
+
+    let game = null;
 
     // create board
     for(let i = 0; i  < 9; i++) {
@@ -251,44 +255,79 @@ function ScreenController() {
         cellButton.textContent = '';
         boardDiv.appendChild(cellButton);
     }
+    const cells = boardDiv.querySelectorAll('.cell');
 
-    startGameBtn.addEventListener('click', () => {
+    const startGame = () => {
+        resetGame();
+        gameSections.forEach(section => section.classList.add('inGame'));
         game = GameController(playerOneInput.value || undefined, playerTwoInput.value || undefined, isPlayerOneBot.checked, isPlayerTwoBot.checked);
-        console.log(playerOneInput, playerTwoInput)
-        gameContainer.style.display = 'block';
         updateScreen();
-    })
+    }
+
+    const resetGame = () => {
+        cells.forEach(cell => cell.classList.remove('animate-scaleDown'));
+        gameSections.forEach(section => section.classList.remove('gameOver'));
+        gameSections.forEach(section => section.classList.remove('inGame'));
+    }
+
+    const backToStart = () => {
+        resetGame();
+        game = null;
+        updateScreen();
+    }
 
     const updateScreen = () => {
-        boardDiv.textContent = "";
 
-        const boardWithValues = game.getBoard();
+        const updateBoard = () => {
+            if(game === null) {
+                cells.forEach(cell => cell.textContent = null);
+            }
+            for(let i = 0; i < game.printBoard().length; i++) {
+                if (typeof game.printBoard()[i] !== 'number') {
+                    cells[i].textContent = game.printBoard()[i];
+                    cells[i].classList.add('animate-scaleDown');
+                } else {
+                    cells[i].textContent = '';
+                }
+            }
+        }
+        updateBoard();
+
         const activePlayer = game.getActivePlayer();
-
         playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
+        const winner = game.getWinner();
+        if(winner) {
+            gameSections.forEach(section => section.classList.remove('inGame'));
+            gameSections.forEach(section => section.classList.add('gameOver'));
+        }
 
-        result.textContent = '';
-        
-        if(game.getWinner() === 'tie') {
-            result.textContent = `This game is a Tie !`;
-            game.resetBoard();
+        if(winner === 'tie') {
+            result.textContent = `This match is a Tie !`;
+        } else if(game.getWinner()) {
+            result.textContent = `${game.getWinner().player.name} wins this match !`;
         }
-        else if(game.getWinner()) {
-            result.textContent = `${game.getWinner().name} wins this match !`;
-            game.resetBoard();
-        }
+
+        inGameMenuContainer.classList.remove('active');
     }
 
     function clickHandlerBoard(e) {
         const index = e.target.dataset.index;
-    
-        if(!index) return;
-    
-        game.playRound(index);
+        if(typeof game.printBoard()[index] === 'number') {
+            game.playRound(index);
+        }
         updateScreen();
     }
+
+    // event listeners
     boardDiv.addEventListener('click', clickHandlerBoard);
 
+    startGameBtn.addEventListener('click', startGame);
+    restartBtns.forEach(btn => btn.addEventListener('click', startGame));
+    homeBtns.forEach(btn => btn.addEventListener('click', backToStart));
+
+    menuBtn.addEventListener('click', () => {
+        inGameMenuContainer.classList.toggle('active');
+    });
 }
 
 

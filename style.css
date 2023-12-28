@@ -98,6 +98,7 @@ h1 {
     font-size: 6.25rem;
     font-weight: bold;
     color: var(--secondary-color);
+    cursor: help;
 }
 
 .bot-container {
@@ -216,6 +217,7 @@ h1 {
 .board {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     width: 31.25rem;
     height: 31.25rem;
     border: none;
@@ -224,6 +226,16 @@ h1 {
 .cell {
     background: transparent;
     border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    font-size: 6.25rem;
+    font-family: 'Baloo 2';
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .cell:first-child {
@@ -283,6 +295,16 @@ h1 {
     cursor: pointer;
 }
 
+.ingame-menu > [class*='button'] {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.ingame-menu.active > [class*='button'] {
+    opacity: 1;
+    visibility: visible;
+}
+
 .game-over-container {
     display: flex;
     background-color: rgba(128, 86, 57, 0.4);
@@ -324,7 +346,7 @@ h1 {
     cursor: pointer;
 }
 
-.start-menu.inGame {
+.start-menu.inGame, .start-menu.gameOver {
     opacity: 0;
     visibility: hidden;
 }
@@ -340,7 +362,7 @@ h1 {
 }
 
 .game-container .board {
-    transform: scale(3);
+    transform: scale(3.5);
     opacity: 0.2;
     z-index: -1;
 }
@@ -348,6 +370,7 @@ h1 {
 .game-container.inGame .board {
     transform: scale(1);
     opacity: 1;
+    z-index: 1;
 }
 
 .game-container.gameOver .board {
@@ -368,4 +391,23 @@ h1 {
 .game-over-container.gameOver {
     opacity: 1;
     visibility: visible;
+}
+
+.animate-scaleDown {
+    animation: scaleDown 200ms ease-in-out;
+}
+
+@keyframes scaleDown {
+    0% {
+        opacity: 0;
+        scale: 2;
+        border: none;
+    }
+    98% {
+        border: none;
+    }
+    100% {
+        opacity: 1;
+        scale: 1;
+    }
 }

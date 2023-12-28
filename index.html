@@ -9,7 +9,7 @@
 <body>
     <h1>Classic Tic-Tac-Toe</h1>
 
-    <div class="start-menu">
+    <div class="game-section start-menu">
         <div class="players-container">
             <div class="player-one-container">
                 <div class="player-one-name-container">
@@ -17,7 +17,7 @@
                     <input type="text" name="player one" id="playerOne" placeholder="Player One's Name">
                 </div>
                 <div class="mark-and-bot">
-                    <div class="mark">X</div>
+                    <div title="This Player gets Marker X" class="mark">X</div>
                     <label for="bot-x" class="bot-container">
                         <svg width="74" height="75" viewBox="0 0 74 75" fill="none" xmlns="http://www.w3.org/2000/svg" class="bot-icon">
                             <g clip-path="url(#clip0_4_237)">
@@ -76,7 +76,7 @@
                             </defs>
                             </svg>
                     </label for="bot-o">
-                    <div class="mark">O</div>
+                    <div title="This Player gets Marker O" class="mark">O</div>
                 </div>
             </div>
         </div>
@@ -86,22 +86,22 @@
         <p class="notice"><strong>Note:</strong> You won't win against the Unbeatable Computer !</p>
     </div>
 
-    <div class="game-container">
+    <div class="game-section game-container">
         <h3 class="turn">It's Player One's turn !</h3>
         <div class="board"></div>
     </div>
 
-    <div class="ingame-menu">
+    <div class="game-section ingame-menu">
         <button type="button" id="menuButton">Menu</button>
-        <button type="button" id="restartButton">Restart</button>
+        <button type="button" class="restart-button">Restart</button>
         <button type="button" class="home-button">Home</button>
     </div>
 
-    <div class="game-over-container">
+    <div class="game-section game-over-container">
         <p id="game-over">Game Over !</p>
         <div class="result">Player One wins this match</div>
         <div class="game-over-buttons">
-            <button type="button" id="playAgainButton">Play Again</button>
+            <button type="button" class="restart-button">Play Again</button>
             <button type="button" class="home-button">Home</button>
         </div>
     </div>

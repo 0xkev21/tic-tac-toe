@@ -14,20 +14,25 @@
     --hover-color: rgb(128, 86, 57);
     --unchecked-color: #614730;
     --disabled-color: #716A5C;
-    --default-radius: 15px;
+    --default-radius: .9375rem;
     --default-trans-duration: 300ms;
 }
 
 body {
     background-color: var(--primary-color);
+}
+
+.body-wrapper {
+    background-color: var(--primary-color);
     font-family: 'Baloo 2', 'Comic Sans MS', Tahoma;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+
 }
 
 h1 {
-    font-size: 3.75rem;
+    font-size: 3rem;
     color: var(--secondary-color);
     margin-top: 40px;
     text-align: center;
@@ -35,25 +40,27 @@ h1 {
 
 .start-menu {
     display: block;
-    padding: 20px 100px;
+    padding: 20px min(60px, 2vw);
 }
 
 .players-container {
     display: flex;
     justify-content: space-around;
     margin-top: 40px;
-    gap: 20px;
+    gap: 1.25rem;
+    width: 100%;
 }
 
 .player-one-container, .player-two-container {
     display: flex;
     flex-direction: column;
     width: 500px;
+    flex-shrink: 1;
 }
 
 .player-one-name-container, .player-two-name-container {
     display: flex;
-    gap: 20px;
+    gap: 1.25rem;
     height: 48px;
 }
 
@@ -75,8 +82,10 @@ h1 {
 }
 
 #playerOne, #playerTwo {
+    min-width: 200px;
     font-size: 1.375rem;
     flex-grow: 1;
+    flex-shrink: 1;
     background-color: var(--secondary-color);
     color: var(--primary-color);
     border-radius: var(--default-radius);
@@ -135,8 +144,8 @@ h1 {
 }
 
 [id*="bot"] {
-    height: 35px;
-    width: 35px;
+    height: 2.1875rem;
+    width: 2.1875rem;
     appearance: none;
     border: 3px solid var(--unchecked-color);
     border-radius: 5px;
@@ -161,8 +170,8 @@ h1 {
 [id*="bot"]::before {
     content: '';
     display: block;
-    width: 30px;
-    height: 30px;
+    width: 1.875rem;
+    height: 1.875rem;
     position: absolute;
     top: 0;
     left: 0;
@@ -186,6 +195,11 @@ h1 {
     font-weight: bold;
 }
 
+svg {
+    width: 4.6875rem;
+    height: 4.6875rem;
+}
+
 svg .stroke {
     fill: var(--unchecked-color);
 }
@@ -195,14 +209,15 @@ svg .stroke {
 }
 
 #startGame {
-    width: 300px;
+    width: 18.75rem;
     height: 67px;
     font-size: 1.875rem;
     text-align: center;
     font-family: 'Baloo 2';
     font-weight: bold;
     display: block;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 50px;
     border-radius: var(--default-radius);
     background-color: var(--secondary-color);
@@ -224,7 +239,8 @@ svg .stroke {
     font-size: 1.25rem;
     color: var(--secondary-color);
     text-align: center;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 10px;
     padding: 10px;
     border-radius: 30px;
@@ -356,7 +372,7 @@ svg .stroke {
 .ingame-menu {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.25rem;
     position: absolute;
     top: 0;
     right: 0;
@@ -369,8 +385,8 @@ svg .stroke {
 }
 
 .ingame-menu > button {
-    width: 200px;
-    height: 60px;
+    width: 12.5rem;
+    height: 3.75rem;
     border: none;
     border-radius: var(--default-radius);
     background-color: var(--secondary-color);
@@ -415,19 +431,20 @@ svg .stroke {
     padding: 10px;
     flex-direction: column;
     text-align: center;
-    margin: auto;
-    margin-top: -220px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: -200px;
     color: var(--secondary-color);
     border-radius: var(--default-radius);
 }
 
 #game-over {
-    font-size: 2.5rem;
+    font-size: 1.875rem;
     font-weight: bold;
 }
 
 .result {
-    font-size: 1.875rem;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
@@ -438,8 +455,8 @@ svg .stroke {
 }
 
 .game-over-buttons > button {
-    width: 200px;
-    height: 60px;
+    width: 12.5rem;
+    height: 3.75rem;
     font-size: 1.25rem;
     border: none;
     border-radius: var(--default-radius);
@@ -455,7 +472,7 @@ svg .stroke {
 
 .start-menu,
 .game-container .turn,
-.game-container .board,
+.game-container,
 .game-over-container,
 .ingame-menu > [class*='button'] {
     transition-property: opacity, visibility;
@@ -463,7 +480,7 @@ svg .stroke {
     transition-timing-function: ease-in-out;
 }
 
-.game-container .board {
+.game-container {
     transition-property: transform, opacity;
 }
 
@@ -487,19 +504,21 @@ svg .stroke {
     visibility: visible;
 }
 
-.game-container .board {
+.game-container {
     transform: scale(3.5);
     opacity: 0.2;
     z-index: -1;
+    pointer-events: none;
 }
 
-.game-container.inGame .board {
+.game-container.inGame {
     transform: scale(1);
     opacity: 1;
     z-index: 1;
+    pointer-events: initial;
 }
 
-.game-container.gameOver .board {
+.game-container.gameOver {
     transform: scale(0.6) translateY(-240px);
     opacity: 1;
 }
@@ -533,6 +552,11 @@ svg .stroke {
     animation: scaleDown 200ms ease-in-out;
 }
 
+button, .bot-container {
+    -webkit-tap-highlight-color: transparent;
+    -moz-tap-highlight-color: transparent;
+}
+
 @keyframes scaleDown {
     0% {
         opacity: 0;
@@ -554,5 +578,59 @@ svg .stroke {
     }
     75% {
         scale: 0.9;
+    }
+}
+
+@media only screen and (max-width:800px) {
+    :root {
+        font-size: 12px;
+    }
+
+    h1 {
+        margin-top: 50px;
+    }
+
+    .start-menu {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 10px;
+        margin-top: -60px;
+    }
+
+    .game-container {
+        margin-top: -80vh;
+    }
+
+    .players-container {
+        flex-direction: column;
+    }
+
+    .player-one-container, .player-two-container {
+        width: 100%;
+    }
+
+    .game-over-container {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    :root {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width:400px) {
+    :root {
+        font-size: 8px;
+    }
+    [id*="bot"]::before {
+        top: -10%;
+        left: -10%;
     }
 }

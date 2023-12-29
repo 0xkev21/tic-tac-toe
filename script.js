@@ -296,6 +296,7 @@ function ScreenController() {
         updateBoard();
 
         const activePlayer = game.getActivePlayer();
+        playerTurnDiv.classList.toggle('fade');
         playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
         const winner = game.getWinner();
         if(winner) {

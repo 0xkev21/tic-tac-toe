@@ -199,7 +199,6 @@ svg .stroke {
     height: 67px;
     font-size: 1.875rem;
     text-align: center;
-    padding: 10px 40px;
     font-family: 'Baloo 2';
     font-weight: bold;
     display: block;
@@ -227,6 +226,8 @@ svg .stroke {
     text-align: center;
     margin: auto;
     margin-top: 10px;
+    padding: 10px;
+    border-radius: 30px;
     position: relative;
     width: max-content;
     overflow: hidden;
@@ -292,6 +293,7 @@ svg .stroke {
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
+    position: relative;
 }
 
 .cell:first-child {
@@ -330,6 +332,25 @@ svg .stroke {
 
 .winIndex {
     background: rgba(90, 106, 97, 0.4);
+}
+
+.board .cell::before {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    opacity: 0;
+    filter: blur(1px);
+}
+
+.board[data-active="O"] .cell:not(.animate-scaleDown):hover::before {
+    content: 'O';
+    opacity: 0.2;
+}
+
+.board[data-active="X"] .cell:not(.animate-scaleDown):hover::before {
+    content: 'X';
+    opacity: 0.2;
 }
 
 .ingame-menu {

@@ -283,36 +283,39 @@ function ScreenController() {
         const updateBoard = () => {
             if(game === null) {
                 cells.forEach(cell => cell.textContent = null);
-            }
-            for(let i = 0; i < game.printBoard().length; i++) {
-                if (typeof game.printBoard()[i] !== 'number') {
-                    cells[i].textContent = game.printBoard()[i];
-                    cells[i].classList.add('animate-scaleDown');
-                } else {
-                    cells[i].textContent = '';
+            } else {
+                for(let i = 0; i < game.printBoard().length; i++) {
+                    if (typeof game.printBoard()[i] !== 'number') {
+                        cells[i].textContent = game.printBoard()[i];
+                        cells[i].classList.add('animate-scaleDown');
+                    } else {
+                        cells[i].textContent = '';
+                    }
                 }
             }
         }
         updateBoard();
 
-        const activePlayer = game.getActivePlayer();
-        playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
-        boardDiv.dataset.active = activePlayer.marker;
-        const winner = game.getWinner();
-        if(winner) {
-            gameSections.forEach(section => section.classList.remove('inGame'));
-            gameSections.forEach(section => section.classList.add('gameOver'));
-        }
+        if(game) {
+            const activePlayer = game.getActivePlayer();
+            playerTurnDiv.textContent = `It's ${activePlayer.name}'s turn.`;
+            boardDiv.dataset.active = activePlayer.marker;
+            const winner = game.getWinner();
+            if(winner) {
+                gameSections.forEach(section => section.classList.remove('inGame'));
+                gameSections.forEach(section => section.classList.add('gameOver'));
+            }
 
-        if(winner === 'tie') {
-            result.textContent = `This match is a Tie !`;
-        } else if(winner) {
-            winner.indexRow.forEach(index => {
-                document.querySelector(`[data-index='${index}']`).classList.add('winIndex');
-            })
-            result.textContent = `${game.getWinner().player.name} wins this match !`;
+            if(winner === 'tie') {
+                result.textContent = `This match is a Tie !`;
+            } else if(winner) {
+                winner.indexRow.forEach(index => {
+                    document.querySelector(`[data-index='${index}']`).classList.add('winIndex');
+                })
+                result.textContent = `${game.getWinner().player.name} wins this match !`;
+            }
         }
-
+        
         inGameMenuContainer.classList.remove('active');
     }
 
